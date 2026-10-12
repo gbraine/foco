@@ -84,8 +84,8 @@ def main(page: ft.Page):
         "rodando": False
     }
 
-    lbl_sessao = ft.Text(value="Sessão: 00:00:00", size=20, color=ft.colors.BLUE_200)
-    lbl_total = ft.Text(value=f"Total Salvo: {str(datetime.timedelta(seconds=total_segundos))}", size=16, color=ft.colors.GREY_400)
+    lbl_sessao = ft.Text(value="Sessão: 00:00:00", size=20, color=ft.Colors.BLUE_200)
+    lbl_total = ft.Text(value=f"Total Salvo: {str(datetime.timedelta(seconds=total_segundos))}", size=16, color=ft.Colors.GREY_400)
     
     def loop_cronometro():
         while True:
@@ -132,7 +132,7 @@ def main(page: ft.Page):
         ft.Text("🧠 Cronômetro de Foco", size=24, weight=ft.FontWeight.BOLD),
         ft.Column([lbl_sessao, lbl_total], alignment=ft.MainAxisAlignment.CENTER),
         ft.Row([btn_timer], alignment=ft.MainAxisAlignment.CENTER),
-        ft.Divider(height=30, color=ft.colors.GREY_800),
+        ft.Divider(height=30, color=ft.Colors.GREY_800),
         ft.Text("📋 Checklist Diário", size=24, weight=ft.FontWeight.BOLD),
         lista_checklist
     )
@@ -141,5 +141,4 @@ def main(page: ft.Page):
     t.start()
 
 if __name__ == "__main__":
-    # O Flet moderno gerencia a porta automaticamente pelas variáveis de ambiente do Render
     ft.run(main)
