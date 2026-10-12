@@ -3,6 +3,7 @@ import time
 import datetime
 import sqlite3
 import os
+import threading
 
 # --- BANCO DE DADOS (SQLite) ---
 DB_NAME = "dados_estudos.db"
@@ -10,14 +11,12 @@ DB_NAME = "dados_estudos.db"
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    # Tabela para o tempo de estudo acumulado
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS estudo (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             segundos INTEGER DEFAULT 0
         )
     """)
-    # Tabela para os itens do checklist
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS checklist (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,7 +25,6 @@ def init_db():
         )
     """)
     
-    # Inserir itens padrão do checklist caso esteja vazio
     itens_padrao = [
         "10 min NSDR / Foco inicial",
         "Bloco 90 min - Discursiva UERJ",
@@ -93,19 +91,21 @@ def main(page: ft.Page):
     lbl_sessao = ft.Text(value="Sessão: 00:00:00", size=20, color=ft.colors.BLUE_200)
     lbl_total = ft.Text(value=f"Total Salvo: {str(datetime.timedelta(seconds=total_segundos))}", size=16, color=ft.colors.GREY_400)
     
-    def atualizar_cronometro():
+    def loop_cronometro():
         while True:
             if estado["rodando"]:
                 estado["segundos_sessao"] += 1
                 td_sessao = datetime.timedelta(seconds=estado["segundos_sessao"])
                 lbl_sessao.value = f"Sessão: {str(td_sessao)}"
-                page.update()
+                try:
+                    page.update()
+                except Exception:
+                    break
             time.sleep(1)
 
     def alternar_cronometro(e):
         estado["rodando"] = not estado["rodando"]
         if not estado["rodando"]:
-            # Ao pausar, salva a sessão no banco
             salvar_sessao_estudo(estado["segundos_sessao"])
             estado["total_acumulado"] += estado["segundos_sessao"]
             estado["segundos_sessao"] = 0
@@ -144,7 +144,9 @@ def main(page: ft.Page):
         lista_checklist
     )
 
-    page.run_thread(atualizar_cronometro)
+    # Inicia a thread em segundo plano nativa do Python
+    t = threading.Thread(target=loop_cronometro, daemon=True)
+    t.start()
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8550))
