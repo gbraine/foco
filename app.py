@@ -84,8 +84,8 @@ def main(page: ft.Page):
         "rodando": False
     }
 
-    lbl_sessao = ft.Text(value="Sessão: 00:00:00", size=20, color=ft.Colors.BLUE_200)
-    lbl_total = ft.Text(value=f"Total Salvo: {str(datetime.timedelta(seconds=total_segundos))}", size=16, color=ft.Colors.GREY_400)
+    lbl_sessao = ft.Text(value="Sessão: 00:00:00", size=20)
+    lbl_total = ft.Text(value=f"Total Salvo: {str(datetime.timedelta(seconds=total_segundos))}", size=16)
     
     def loop_cronometro():
         while True:
@@ -105,13 +105,13 @@ def main(page: ft.Page):
             salvar_sessao_estudo(estado["segundos_sessao"])
             estado["total_acumulado"] += estado["segundos_sessao"]
             estado["segundos_sessao"] = 0
-            lbl_sessao.value = "Sessão: 00:00:00"
+            lbl_sessao.value = f"Sessão: {str(datetime.timedelta(seconds=0))}"
             lbl_total.value = f"Total Salvo: {str(datetime.timedelta(seconds=estado['total_acumulado']))}"
             
         btn_timer.text = "PAUSAR E SALVAR" if estado["rodando"] else "INICIAR FOCO"
         page.update()
 
-    btn_timer = ft.ElevatedButton("INICIAR FOCO", on_click=alternar_cronometro)
+    btn_timer = ft.Button(text="INICIAR FOCO", on_click=alternar_cronometro)
 
     lista_checklist = ft.Column()
 
@@ -129,11 +129,12 @@ def main(page: ft.Page):
         )
 
     page.add(
-        ft.Text("🧠 Cronômetro de Foco", size=24, weight=ft.FontWeight.BOLD),
-        ft.Column([lbl_sessao, lbl_total], alignment=ft.MainAxisAlignment.CENTER),
-        ft.Row([btn_timer], alignment=ft.MainAxisAlignment.CENTER),
-        ft.Divider(height=30, color=ft.Colors.GREY_800),
-        ft.Text("📋 Checklist Diário", size=24, weight=ft.FontWeight.BOLD),
+        ft.Text("🧠 Cronômetro de Foco", size=24),
+        lbl_sessao,
+        lbl_total,
+        btn_timer,
+        ft.Divider(),
+        ft.Text("📋 Checklist Diário", size=24),
         lista_checklist
     )
 
