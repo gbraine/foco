@@ -42,7 +42,6 @@ def init_db():
 def carregar_dados():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    
     cursor.execute("SELECT SUM(segundos) FROM estudo")
     row_tempo = cursor.fetchone()
     total_segundos = row_tempo[0] if row_tempo and row_tempo[0] else 0
@@ -50,7 +49,6 @@ def carregar_dados():
     cursor.execute("SELECT texto, feito FROM checklist")
     rows_checklist = cursor.fetchall()
     checklist = [{"texto": r[0], "feito": bool(r[1])} for r in rows_checklist]
-    
     conn.close()
     return total_segundos, checklist
 
@@ -69,12 +67,11 @@ def salvar_sessao_estudo(segundos):
         conn.commit()
         conn.close()
 
-# Inicializa o banco de dados
 init_db()
 
 # --- APLICAÇÃO FLET ---
 def main(page: ft.Page):
-    page.title = "Central de Performance & Estudos (UERJ)"
+    page.title = "Foco - UERJ"
     page.theme_mode = ft.ThemeMode.DARK
     page.padding = 20
     page.scroll = ft.ScrollMode.AUTO
@@ -87,7 +84,6 @@ def main(page: ft.Page):
         "rodando": False
     }
 
-    # --- ELEMENTOS ---
     lbl_sessao = ft.Text(value="Sessão: 00:00:00", size=20, color=ft.colors.BLUE_200)
     lbl_total = ft.Text(value=f"Total Salvo: {str(datetime.timedelta(seconds=total_segundos))}", size=16, color=ft.colors.GREY_400)
     
@@ -113,12 +109,10 @@ def main(page: ft.Page):
             lbl_total.value = f"Total Salvo: {str(datetime.timedelta(seconds=estado['total_acumulado']))}"
             
         btn_timer.text = "PAUSAR E SALVAR" if estado["rodando"] else "INICIAR FOCO"
-        btn_timer.button_style = ft.ButtonStyle(color=ft.colors.RED_400 if estado["rodando"] else ft.colors.GREEN_400)
         page.update()
 
     btn_timer = ft.ElevatedButton("INICIAR FOCO", on_click=alternar_cronometro)
 
-    # --- CHECKLIST ---
     lista_checklist = ft.Column()
 
     def alternar_item(e):
@@ -134,20 +128,19 @@ def main(page: ft.Page):
             )
         )
 
-    # --- LAYOUT ---
     page.add(
         ft.Text("🧠 Cronômetro de Foco", size=24, weight=ft.FontWeight.BOLD),
         ft.Column([lbl_sessao, lbl_total], alignment=ft.MainAxisAlignment.CENTER),
         ft.Row([btn_timer], alignment=ft.MainAxisAlignment.CENTER),
         ft.Divider(height=30, color=ft.colors.GREY_800),
-        ft.Text("📋 Checklist Diário Sincronizado", size=24, weight=ft.FontWeight.BOLD),
+        ft.Text("📋 Checklist Diário", size=24, weight=ft.FontWeight.BOLD),
         lista_checklist
     )
 
-    # Inicia a thread em segundo plano nativa do Python
     t = threading.Thread(target=loop_cronometro, daemon=True)
     t.start()
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8550))
-    ft.app(target=main, view=ft.AppView.WEB_BROWSER, host="0.0.0.0", port=port)
+    # Rodando estritamente como servidor web sem view de desktop/browser forçada
+    ft.app(target=main, view=None, host="0.0.0.0", port=port)
