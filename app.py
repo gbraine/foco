@@ -141,6 +141,5 @@ def main(page: ft.Page):
     t.start()
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8550))
-    # Sintaxe limpa compatível com a versão moderna do Flet no Render
-    ft.app(target=main, port=port)
+    # O Flet moderno gerencia a porta automaticamente pelas variáveis de ambiente do Render
+    ft.run(main)
