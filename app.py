@@ -99,19 +99,23 @@ def main(page: ft.Page):
                     break
             time.sleep(1)
 
+    # Usamos o conteúdo ft.Text dentro do botão para evitar qualquer conflito de argumento nomeado antigo
+    btn_timer = ft.ElevatedButton(
+        content=ft.Text("INICIAR FOCO"),
+        on_click=lambda e: alternar_cronometro(e)
+    )
+
     def alternar_cronometro(e):
         estado["rodando"] = not estado["rodando"]
         if not estado["rodando"]:
             salvar_sessao_estudo(estado["segundos_sessao"])
             estado["total_acumulado"] += estado["segundos_sessao"]
             estado["segundos_sessao"] = 0
-            lbl_sessao.value = f"Sessão: {str(datetime.timedelta(seconds=0))}"
+            lbl_sessao.value = "Sessão: 00:00:00"
             lbl_total.value = f"Total Salvo: {str(datetime.timedelta(seconds=estado['total_acumulado']))}"
             
-        btn_timer.text = "PAUSAR E SALVAR" if estado["rodando"] else "INICIAR FOCO"
+        btn_timer.content.value = "PAUSAR E SALVAR" if estado["rodando"] else "INICIAR FOCO"
         page.update()
-
-    btn_timer = ft.Button(text="INICIAR FOCO", on_click=alternar_cronometro)
 
     lista_checklist = ft.Column()
 
