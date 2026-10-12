@@ -142,5 +142,5 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8550))
-    # Rodando estritamente como servidor web sem view de desktop/browser forçada
-    ft.app(target=main, view=None, host="0.0.0.0", port=port)
+    # Sintaxe limpa compatível com a versão moderna do Flet no Render
+    ft.app(target=main, port=port)
